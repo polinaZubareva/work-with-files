@@ -15,8 +15,4 @@ export class DtoUser {
   @IsString()
   @IsNotEmpty()
   password: string;
-
-  // @IsString()
-  // @MinLength(8)
-  // salt: string;
 }
