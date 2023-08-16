@@ -15,7 +15,7 @@ export class Salt {
   @Column()
   saltText: string;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 }

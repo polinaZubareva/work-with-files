@@ -55,4 +55,10 @@ export class UserService {
 
     return foundUser;
   }
+
+  public async deleteUser(login: string) {
+    const deleted = await this.usersRepo.delete(login);
+    console.log(deleted);
+    return `Affected rows: ${deleted.affected}`;
+  }
 }

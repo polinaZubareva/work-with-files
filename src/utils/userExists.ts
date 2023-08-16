@@ -5,5 +5,5 @@ export async function userExists(
   login: string,
   usersRepo: Repository<User>
 ): Promise<boolean> {
-  return (await usersRepo.findOne({ where: { login: login } })) ? true : false;
+  return !!(await usersRepo.findOne({ where: { login: login } }));
 }
