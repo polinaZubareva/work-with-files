@@ -48,12 +48,24 @@ export class UserService {
     return newUser;
   }
 
-  public async findOne(id: number): Promise<TUser> {
+  public async findOne(field: string, value: number | string): Promise<TUser> {
     const foundUser: TUser = { ok: false };
-    foundUser.user = await this.usersRepo.findOne({ where: { id: id } });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    foundUser.user = await this.usersRepo.findOne({
+      where: { [field]: value },
+    });
     if (!!foundUser.user) foundUser.ok = true;
 
     return foundUser;
+  }
+
+  async getUserAndSalt(userDto: DtoUser) {
+    const user = (await this.findOne('login', userDto.login)).user;
+    const salt = await this.saltsRepo.findOne({
+      where: { user: { id: user.id } },
+    });
+    return { user, salt };
   }
 
   public async deleteUser(login: string) {

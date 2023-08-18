@@ -12,8 +12,13 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.userService.findOne(id);
+  findOneId(@Param('id') id: number) {
+    return this.userService.findOne('id', id);
+  }
+
+  @Get()
+  findOne(@Body() { field, value }) {
+    return this.userService.findOne(field, value);
   }
 
   @Delete()
