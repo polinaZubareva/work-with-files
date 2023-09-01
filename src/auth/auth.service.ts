@@ -1,9 +1,9 @@
-import { JwtService } from '@nestjs/jwt';
-import { UserService } from './../user/user.service';
 import { Injectable } from '@nestjs/common';
-import { DtoUser } from 'src/user/user.type';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { TAuthUser } from './auth.type';
+import { DtoUser } from 'src/user/user.type';
+import { UserService } from './../user/user.service';
+import { createToken } from './helpers';
 
 @Injectable()
 export class AuthService {
@@ -13,25 +13,30 @@ export class AuthService {
   ) {}
 
   async logIn(userDto: DtoUser) {
-    const { user, salt } = await this.userService.getUserAndSalt(userDto);
-    const authResult: TAuthUser = {
-      ok: false,
-    };
+    const { user, salt } =
+      (await this.userService.getUserWithSalt(userDto)) ?? {};
+
     if (
       user &&
       user.password === bcrypt.hashSync(userDto.password, salt.saltText)
     ) {
-      console.log('Authentication passed');
-      authResult.ok = true;
+      return {
+        ok: true,
+        userLogin: user.login,
+        accessToken: await createToken(user.login, this.jwtService),
+      };
     } else {
-      console.log('Authentication failed');
-      authResult.error = 'Authentication failed';
+      return { ok: false, error: 'Authentication failed' };
     }
-    return authResult;
   }
 
-  async signIn(userDto: DtoUser) {
+  async signUp(userDto: DtoUser) {
     const createdUser = await this.userService.createUser(userDto);
-    return createdUser;
+
+    return {
+      user: createdUser,
+      accessToken:
+        (await createToken(createdUser?.user?.login, this.jwtService)) ?? null,
+    };
   }
 }

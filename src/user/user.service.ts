@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
-import { DtoUser, TUser } from './user.type';
+import { DtoUser, TUser, TUserSalt } from './user.type';
 import { Salt } from 'src/entity/salt.entity';
 import { hash } from '../utils/hashData';
 import { userExists } from 'src/utils/userExists';
@@ -49,28 +49,30 @@ export class UserService {
   }
 
   public async findOne(field: string, value: number | string): Promise<TUser> {
-    const foundUser: TUser = { ok: false };
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    foundUser.user = await this.usersRepo.findOne({
+    const findResult = await this.usersRepo.findOne({
       where: { [field]: value },
     });
-    if (!!foundUser.user) foundUser.ok = true;
 
-    return foundUser;
+    return { user: findResult, ok: !!findResult };
   }
 
-  async getUserAndSalt(userDto: DtoUser) {
-    const user = (await this.findOne('login', userDto.login)).user;
+  private async getSalt(id: number): Promise<Salt> {
     const salt = await this.saltsRepo.findOne({
-      where: { user: { id: user.id } },
+      where: { user: { id: id } },
     });
+    return salt;
+  }
+
+  async getUserWithSalt(userDto: DtoUser): Promise<TUserSalt> | null {
+    const user = (await this.findOne('login', userDto.login)).user;
+
+    if (!user) return null;
+    const salt = await this.getSalt(user.id);
+
     return { user, salt };
   }
 
   public async deleteUser(login: string) {
-    const deleted = await this.usersRepo.delete(login);
-    console.log(deleted);
-    return `Affected rows: ${deleted.affected}`;
+    return `Affected rows: ${await this.usersRepo.delete(login)}`;
   }
 }
