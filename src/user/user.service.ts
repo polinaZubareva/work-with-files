@@ -75,4 +75,15 @@ export class UserService {
   public async deleteUser(login: string) {
     return `Affected rows: ${await this.usersRepo.delete(login)}`;
   }
+
+  public async updateUser(id: number, userDto: DtoUser) {
+    const saltedData = await hash(userDto.password);
+    userDto.password = saltedData.hashedPassword;
+
+    this.saltsRepo.update({ id }, { saltText: saltedData.salt });
+
+    return ` Affected ${
+      (await this.usersRepo.update({ id }, { ...userDto })).affected
+    }`;
+  }
 }

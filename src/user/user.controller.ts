@@ -5,10 +5,12 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { DtoUser } from './user.type';
 
 @Controller('/user')
 export class UserController {
@@ -29,5 +31,11 @@ export class UserController {
   @Delete()
   delete(@Body() login: string) {
     return this.userService.deleteUser(login);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  update(@Param('id', ParseIntPipe) id: number, @Body() userDto: DtoUser) {
+    return this.userService.updateUser(id, userDto);
   }
 }

@@ -3,14 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JWTCONSTANTS } from '../constants';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(
-    private userService: UserService,
-    private jwtService: JwtService
-  ) {
+  constructor(private userService: UserService) {
     super({
       global: true,
       usernameField: 'login',
@@ -22,9 +18,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: { login: string }) {
-    // const token = await this.jwtService.signAsync(payload);
-    // if(token===)
-    return await this.userService.findOne('login', payload.login);
+  async validate(payload: { login: string; password: string }) {
+    // return await this.userService.findOne('login', payload.login);
+    console.log('balbal');
+
+    return payload;
   }
 }
