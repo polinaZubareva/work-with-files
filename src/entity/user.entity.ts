@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { Video } from './video.entity';
+import { Video } from '.';
 
 @Entity()
 export class User {

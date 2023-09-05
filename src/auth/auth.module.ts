@@ -4,23 +4,21 @@ import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
-import { User } from 'src/entity/user.entity';
-import { Salt } from 'src/entity/salt.entity';
+import { User, Video } from 'src/entity';
+import { Salt } from 'src/entity';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './strategies/jwt-strategy';
-import { JWTCONSTANTS } from './constants';
 import { LocalStrategy } from './strategies/local-strategy';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Salt]),
+    TypeOrmModule.forFeature([User, Salt, Video]),
+    JwtModule.register({}),
     UserModule,
     PassportModule,
-    JwtModule.register({
-      secret: JWTCONSTANTS.secret,
-    }),
   ],
-  providers: [UserService, JwtStrategy, LocalStrategy],
   controllers: [AuthController],
+  providers: [UserService, LocalStrategy, JwtAuthGuard],
+  exports: [JwtModule],
 })
 export class AuthModule {}

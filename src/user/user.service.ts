@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/entity/user.entity';
+import { User, Video } from 'src/entity';
 import { Repository } from 'typeorm';
 import { DtoUser, TUser, TUserSalt } from './user.type';
-import { Salt } from 'src/entity/salt.entity';
-import { hash } from '../utils/hashData';
-import { userExists } from 'src/utils/userExists';
+import { Salt } from 'src/entity';
+import { hash } from '../utils';
+import { userExists } from 'src/utils';
 
 @Injectable()
 export class UserService {
@@ -13,7 +13,9 @@ export class UserService {
     @InjectRepository(User)
     private usersRepo: Repository<User>,
     @InjectRepository(Salt)
-    private saltsRepo: Repository<Salt>
+    private saltsRepo: Repository<Salt>,
+    @InjectRepository(Video)
+    private videosRepo: Repository<Video>
   ) {}
 
   public async createUser(createUserDto: DtoUser): Promise<TUser> {
@@ -85,5 +87,18 @@ export class UserService {
     return ` Affected ${
       (await this.usersRepo.update({ id }, { ...userDto })).affected
     }`;
+  }
+
+  public async uploadVideo(id: number, videoData: Buffer) {
+    const user = await this.findOne('id', id);
+    if (!user) throw new Error('User not found');
+    console.log(user);
+
+    const addedVideo = this.videosRepo.create({
+      videoData: videoData,
+      user: user.user,
+    });
+
+    this.videosRepo.save(addedVideo).then((value) => console.log(value));
   }
 }

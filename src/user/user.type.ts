@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { Salt } from 'src/entity/salt.entity';
-import { User } from 'src/entity/user.entity';
+import { Salt, Video } from 'src/entity';
+import { User } from 'src/entity';
 
 export type TUser = {
   ok: boolean;
@@ -22,3 +22,10 @@ export class DtoUser {
   @IsNotEmpty()
   password: string;
 }
+
+export type TUsersVideo = {
+  ok: boolean;
+  user?: User;
+  video?: Video;
+  error?: string;
+};

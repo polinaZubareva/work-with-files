@@ -1,4 +1,4 @@
-import { User } from 'src/entity/user.entity';
+import { User } from 'src/entity';
 import { Repository } from 'typeorm';
 
 export async function userExists(

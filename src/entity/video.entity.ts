@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '.';
 
 @Entity()
 export class Video {
@@ -9,7 +9,7 @@ export class Video {
   @Column({
     type: 'bytea',
   })
-  videoData: Uint8Array;
+  videoData: Buffer;
 
   @ManyToOne(() => User, (user) => user.videos)
   user: User;

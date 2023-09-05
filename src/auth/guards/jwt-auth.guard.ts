@@ -17,15 +17,14 @@ export class JwtAuthGuard implements CanActivate {
     if (!token) throw new UnauthorizedException('Token is required');
 
     try {
-      (await this.authService.verifyToken(token)) ?? null;
+      const decoded = (await this.authService.verifyToken(token)) ?? null;
+      if (decoded?.exp < 0)
+        throw new UnauthorizedException('Token is required to be updated');
     } catch (error) {
       console.log(error.message);
       throw new UnauthorizedException('Token is not valid');
     }
 
-    //
-    //
-    //
     return true;
   }
 

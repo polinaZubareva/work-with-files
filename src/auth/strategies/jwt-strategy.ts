@@ -1,8 +1,7 @@
 import { UserService } from '../../user/user.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { JWTCONSTANTS } from '../constants';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -13,15 +12,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       passwordField: 'password',
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: JWTCONSTANTS.secret,
-      signOptions: { expiresIn: '1h' },
+      secretOrKey: process.env.JWT_SECRET,
+      signOptions: { expiresIn: process.env.JWT_EXPIRATION },
     });
   }
 
   async validate(payload: { login: string; password: string }) {
-    // return await this.userService.findOne('login', payload.login);
-    console.log('balbal');
+    const user = await this.userService.findOne('login', payload.login);
 
+    if (!user) throw new UnauthorizedException(`User doesn't exist`);
     return payload;
   }
 }
