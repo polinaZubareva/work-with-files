@@ -37,12 +37,15 @@ export class AuthService {
         accessToken: await this.createToken(payload),
       };
     } else {
-      return { ok: false, error: 'Authentication failed' };
+      return { ok: false, error: 'Email or password is incorrect' };
     }
   }
 
   async signUp(userDto: DtoUser) {
     const createdUser = await this.userService.createUser(userDto);
+
+    if (createdUser.error) return { createdUser };
+
     const payload: Token = {
       sub: createdUser.user?.id.toString(),
       login: createdUser.user?.login,

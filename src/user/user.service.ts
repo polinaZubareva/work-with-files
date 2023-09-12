@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, Video } from 'src/entity';
 import { Repository } from 'typeorm';
@@ -59,10 +59,9 @@ export class UserService {
   }
 
   private async getSalt(id: number): Promise<Salt> {
-    const salt = await this.saltsRepo.findOne({
+    return await this.saltsRepo.findOne({
       where: { user: { id: id } },
     });
-    return salt;
   }
 
   async getUserWithSalt(userDto: DtoUser): Promise<TUserSalt> | null {
@@ -89,16 +88,22 @@ export class UserService {
     }`;
   }
 
-  public async uploadVideo(id: number, videoData: Buffer) {
+  public async saveVideo(id: number, videoData: Buffer) {
     const user = await this.findOne('id', id);
-    if (!user) throw new Error('User not found');
-    console.log(user);
+    if (!user) throw new NotFoundException('User not found');
 
     const addedVideo = this.videosRepo.create({
       videoData: videoData,
       user: user.user,
     });
 
-    this.videosRepo.save(addedVideo).then((value) => console.log(value));
+    await this.videosRepo
+      .save(addedVideo)
+      .then((value) => {
+        return { value, ok: true };
+      })
+      .catch((reason) => {
+        return { ok: false, error: reason };
+      });
   }
 }

@@ -9,10 +9,12 @@ import {
   Put,
   UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { DtoUser } from './user.type';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(JwtAuthGuard)
 @Controller('/user')
@@ -40,7 +42,12 @@ export class UserController {
   }
 
   @Post(':id/uploadVideo')
-  uploadFile(@Param('id', ParseIntPipe) id: number, @UploadedFile() file) {
-    return this.userService.uploadVideo(id, file);
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    console.log(file);
+    return this.userService.saveVideo(id, file.buffer);
   }
 }
