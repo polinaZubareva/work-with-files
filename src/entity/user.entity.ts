@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  JoinTable,
+} from 'typeorm';
 import { Video } from '.';
 
 @Entity()
@@ -13,5 +19,16 @@ export class User {
   password: string;
 
   @OneToMany(() => Video, (video) => video.user)
+  @JoinTable({
+    name: 'user_videos',
+    joinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'videoId',
+      referencedColumnName: 'id',
+    },
+  })
   videos?: Video[];
 }

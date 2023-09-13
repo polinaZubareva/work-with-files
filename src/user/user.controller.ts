@@ -22,32 +22,34 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get(':id')
-  findOneId(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.findOne('id', id);
+  async findOneId(@Param('id', ParseIntPipe) id: number) {
+    return await this.userService.findOne('id', id);
   }
 
   @Get()
-  findOne(@Body() { field, value }) {
-    return this.userService.findOne(field, value);
+  async findOne(@Body() { field, value }) {
+    return await this.userService.findOne(field, value);
   }
 
   @Delete()
-  delete(@Body() login: string) {
-    return this.userService.deleteUser(login);
+  async delete(@Body() login: string) {
+    return await this.userService.deleteUser(login);
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() userDto: DtoUser) {
-    return this.userService.updateUser(id, userDto);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() userDto: DtoUser
+  ) {
+    return await this.userService.updateUser(id, userDto);
   }
 
   @Post(':id/uploadVideo')
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(
+  async uploadFile(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File
   ) {
-    console.log(file);
-    return this.userService.saveVideo(id, file.buffer);
+    return await this.userService.saveVideo(id, file.buffer);
   }
 }
