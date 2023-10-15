@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { User } from '.';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Video {
@@ -10,7 +9,4 @@ export class Video {
     type: 'bytea',
   })
   videoData: Buffer;
-
-  @ManyToOne(() => User, (user) => user.videos)
-  user: User;
 }

@@ -1,20 +1,20 @@
-import { Video } from './video.entity';
 import { Entity, JoinColumn, ManyToMany, PrimaryColumn } from 'typeorm';
 import { User } from './user.entity';
+import { Photo } from './photo.entity';
 
-@Entity('user_videos')
-export class UserVideos {
+@Entity('user_photos')
+export class UserPhotos {
   @PrimaryColumn({ name: 'userId' })
   userId: number;
 
-  @PrimaryColumn({ name: 'videoId' })
-  videoId: number;
+  @PrimaryColumn({ name: 'photoId' })
+  photoId: number;
 
   @ManyToMany(() => User)
   @JoinColumn([{ name: 'userId', referencedColumnName: 'id' }])
   users: User[];
 
-  @ManyToMany(() => Video)
-  @JoinColumn([{ name: 'videoId', referencedColumnName: 'id' }])
-  videos: Video[];
+  @ManyToMany(() => Photo)
+  @JoinColumn([{ name: 'photoId', referencedColumnName: 'id' }])
+  photos: Photo[];
 }

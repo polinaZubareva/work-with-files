@@ -1,4 +1,4 @@
 export interface Token {
-  sub: string;
+  sub?: string;
   login: string;
 }

@@ -1,3 +1,7 @@
 /dist
 /node_modules
 .env
+1.jpeg
+/upload
+.gitignore
+/models

@@ -1,11 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User, UserVideos, Video } from 'src/entity';
 import { Repository } from 'typeorm';
+import { User, Salt } from 'src/entity';
 import { DtoUser, TUser, TUserSalt } from './user.type';
-import { Salt } from 'src/entity';
-import { hash } from '../utils';
-import { userExists } from 'src/utils';
+import { userExists, hash } from 'src/utils';
 
 @Injectable()
 export class UserService {
@@ -13,11 +11,7 @@ export class UserService {
     @InjectRepository(User)
     private usersRepo: Repository<User>,
     @InjectRepository(Salt)
-    private saltsRepo: Repository<Salt>,
-    @InjectRepository(Video)
-    private videosRepo: Repository<Video>,
-    @InjectRepository(UserVideos)
-    private userVideosRepo: Repository<UserVideos>
+    private saltsRepo: Repository<Salt>
   ) {}
 
   public async createUser(createUserDto: DtoUser): Promise<TUser> {
@@ -69,7 +63,7 @@ export class UserService {
   async getUserWithSalt(userDto: DtoUser): Promise<TUserSalt> | null {
     const user = (await this.findOne('login', userDto.login)).user;
 
-    if (!user) return null;
+    if (!user) throw new NotFoundException();
     const salt = await this.getSalt(user.id);
 
     return { user, salt };
@@ -88,29 +82,5 @@ export class UserService {
     return ` Affected ${
       (await this.usersRepo.update({ id }, { ...userDto })).affected
     }`;
-  }
-
-  public async saveVideo(id: number, videoData: Buffer) {
-    const user = await this.findOne('id', id);
-    if (!user) throw new NotFoundException('User not found');
-
-    const addedVideo = this.videosRepo.create({
-      videoData: videoData,
-      user: user.user,
-    });
-
-    await this.videosRepo
-      .save(addedVideo)
-      .then((value) => {
-        this.addUserVideoKeys(id, addedVideo.id);
-        return { value, ok: true };
-      })
-      .catch((reason) => {
-        return { ok: false, error: reason };
-      });
-  }
-
-  private async addUserVideoKeys(userId: number, videoId: number) {
-    return await this.userVideosRepo.save({ userId, videoId });
   }
 }

@@ -5,16 +5,13 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Post,
   Put,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
+import '@tensorflow/tfjs-node';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { DtoUser } from './user.type';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(JwtAuthGuard)
 @Controller('/user')
@@ -42,14 +39,5 @@ export class UserController {
     @Body() userDto: DtoUser
   ) {
     return await this.userService.updateUser(id, userDto);
-  }
-
-  @Post(':id/uploadVideo')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(
-    @Param('id', ParseIntPipe) id: number,
-    @UploadedFile() file: Express.Multer.File
-  ) {
-    return await this.userService.saveVideo(id, file.buffer);
   }
 }

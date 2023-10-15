@@ -4,19 +4,12 @@ import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
-import { User, UserVideos, Video } from 'src/entity';
-import { Salt } from 'src/entity';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local-strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User, Salt, Video, UserVideos]),
-    JwtModule.register({}),
-    UserModule,
-    PassportModule,
-  ],
+  imports: [TypeOrmModule, JwtModule.register({}), UserModule, PassportModule],
   controllers: [AuthController],
   providers: [UserService, LocalStrategy, JwtAuthGuard],
   exports: [JwtModule],

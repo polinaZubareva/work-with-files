@@ -29,3 +29,9 @@ export type TUsersVideo = {
   video?: Video;
   error?: string;
 };
+
+export type TUserOk = {
+  ok: boolean;
+  status: string;
+  error?: string;
+};
